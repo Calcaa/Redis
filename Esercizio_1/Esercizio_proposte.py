@@ -1,10 +1,20 @@
 import redis
-r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+from sys import exit
 
-print(f"Stato db: {r.ping()}")
-#r.set("stocazzo", "1234")
+# connessione a redis
+
+try:
+    r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+    print(f"Stato db: {r.ping()}")
+    print("Connessione a redis in locale riuscita!")
+except redis.ConnectionError: 
+    print("Devi avviare Docker e runnare il container con Redis!")
+    exit()
+    
+# richiesta nome utente e psw
+
 print(f"Benvenuto, come prima cosa dimmi chi cazzo sei")
-nome_utente =input("Nome utente: ")
+nome_utente = input("Nome utente: ")
 
 pw_utente = r.get(nome_utente)
 if pw_utente:
