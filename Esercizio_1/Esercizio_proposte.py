@@ -2,7 +2,6 @@ import redis
 from sys import exit
 
 # connessione a redis
-
 try:
     r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
     print(f"Stato db: {r.ping()}")
@@ -11,27 +10,32 @@ except redis.ConnectionError:
     print("Devi avviare Docker e runnare il container con Redis!")
     exit()
     
-# richiesta nome utente e psw
-
-print(f"Benvenuto, come prima cosa dimmi chi cazzo sei")
+# richiesta nome utente 
+print(f"Benvenuto, inserisci il tuo nome utente.")
 nome_utente = input("Nome utente: ")
 
 pw_utente = r.get(nome_utente)
 if pw_utente:
+
+    # richiesta psw
     pw = input("Password: ")
 
+    # se psw inserita corrisponde ad esistente
     if pw == pw_utente:
         print(f"Benvenuto {nome_utente}\n")
 
         while True:
+            # selezione azione
             choose = input(f"\n\nCosa vuoi fare?\n1 - Aggiungi proposta\n2 - Vota Proposta\n3 - Visualizza proposte\n\nScelta: ")
 
+            # 1 - scelta aggiunta proposta
             if choose == "1":
                 nome_proposta = input("Nome proposta: ")
                 descrizione_proposta = input("Descrizione: ")
 
                 r.set(f"Proposte:{nome_proposta}", f"{descrizione_proposta}")
-
+            
+            # 2 - scelta voto proposta
             elif choose == "2":
                 nome_proposta = input("Che proposta vuoi votare?\nNome: ")
 
@@ -44,16 +48,22 @@ if pw_utente:
                 else:
                     print("Nooonnn Iesiìììstie")
 
+            # 3 - scelta lettura proposte
             elif choose == "3":
                 """proposte = r.get(f"Voti:")
                 print(proposte)"""
                 #Non funzica
 
     else:
+
+        # se la psw inserita non corrisponde a quella esistente
         print("Coglione non ti ricordi la password")
+
+# se l'utente non esiste
 else:
     choose = input("Vuoi creare un nuovo utente? (y/n)\n")
 
+    # se scegli di creare un nuovo profilo utente
     if choose == "y":
         pw = input("Inserisci la password")
         r.set(nome_utente, pw)
