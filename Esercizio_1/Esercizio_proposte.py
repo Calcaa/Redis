@@ -41,7 +41,7 @@ while True:
 
             while True:
                 # selezione azione
-                choose = input(f"\n\nCosa vuoi fare?\n1 - Aggiungi proposta\n2 - Vota Proposta\n3 - Visualizza proposte\n4 - Esci\n\nScelta: ")
+                choose = input(f"\n\nCosa vuoi fare?\n1 - Aggiungi proposta\n2 - Vota Proposta\n3 - Visualizza proposte\n4 - Visualizza voti\n5 - Esci\n\nScelta: ")
 
                 # 1 - scelta aggiunta proposta
                 if choose == "1":
@@ -65,12 +65,22 @@ while True:
 
                 # 3 - scelta lettura proposte
                 elif choose == "3":
-                    proposte = r.get(f"Voti:")
-                    print(proposte)
-                
+                    proposte = r.keys('Proposte:*')
+                    for proposta in proposte:
+                        print(f'Nome: {proposta.split(':')[1]}')
+                        print(f'Descrizione: {r.get(proposta)}\n')
+                 
                 elif choose == '4':
+                    proposte = r.keys('Proposte:*')
+                    for proposta in proposte:
+                        print(f'Nome: {proposta.split(':')[1]}')
+                        print(f'Voti: {r.get(f'voti:{proposta}')}\n')
+                     
+                   
+                elif choose == '5':
                     print('bye bye')
                     break
+                
                     
 
         else:
