@@ -2,7 +2,7 @@ import redis
 import redisfunc 
 
 # connessione a Redis cloud
-r = redisfunc.cloudConnect()
+r = redisfunc.connessioneCloud()
 
 
 print("Benvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!")

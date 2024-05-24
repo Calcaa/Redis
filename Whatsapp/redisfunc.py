@@ -1,5 +1,5 @@
 import redis
-from os import exit
+from sys import exit
 
 # Connessione a Redis
 def connessioneCloud() -> redis:
@@ -65,3 +65,7 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
     # se il contatto non esiste
     else:
         print("Non esiste alcun utente con questo nome!")
+
+# FUNZIONE crea lista utenti in modalità DND, se stato è True diventa False e viceversa.
+def DND_MODE(r : redis, nome_utente : str, dnd : bool) -> None:
+    r.hset("Utenti:DND",nome_utente,int(not dnd)) 
