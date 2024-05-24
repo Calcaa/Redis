@@ -2,6 +2,7 @@ import redis
 import redisfunc
 from sys import exit
 
+# connessione a Redis cloud
 r = redisfunc.cloudConnect()
 
 #FUNZIONE PER ACCEDERE, chiede nome, se esiste chiede psw, se corretta dà il bentornato.
@@ -24,26 +25,28 @@ def ACCESSO ():
         print("Non esiste un utente con questo nome")
     return nome_utente
 
+#---------------------------------------
+# Aggiungere parte per conttrollo accesso o registrazione
+#--------------------------------------
+
+
 # FUNZIONE PER REGISTRARSI, chiede nome utente, se non è gia presente chiede di inserire una psw
 # poi salva nome utente e psw e dà il benvenuto. infine chiede di aggiungere il primo contatto.
-utente_on = ""
-def REGISTRAZIONE ():
-    global utente_on
 
-    # chiede nome utente
-    nome_utente = input("Per cominciare inserisci il tuo nome utente: ")   
+def registrazione (nome_utente : str, pw : str):
+
     # se il nome utente non esiste
     if not r.exists(nome_utente):
-        # chiede inserimento psw
-        pw = input("Inserisci una password di almeno 27 caratteri, di cui uno speciale, un numero trascendente, un ideogramma cinese, un disegnino che ti rappresenta")
+        
         # salva utente e psw
         r.hset("Utenti",nome_utente, pw)
+
         # Benvenuto
         print(f"Benvenuto su AAAAAAAAAtsapp, {nome_utente}!\n") 
+
         # richiama funzione aggiungi contatto
         print("Cerca subito un utente con cui chattare!")
         AGGIUNTA_CONTATTO()
-        utente_on=nome_utente
 
     # se il nome utente esiste già
     else: 
