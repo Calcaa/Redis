@@ -1,14 +1,9 @@
 import redis
-from sys import exit
+import redisfunc
 
-# Connessione a Redis
-try:
-    r = redis.Redis(host="redis-11521.c135.eu-central-1-1.ec2.redns.redis-cloud.com", port=11521, password="sUaEw4HsesMiuONu3MURRZvuUDLqXeEi", db=0, decode_responses=True)
-    print(f"Stato db: {r.ping()}")
-    print("Connessione a redis in locale riuscita!")
-except redis.ConnectionError:
-    print("Devi avviare Docker e runnare il container con Redis!")
-    exit()
+
+# connessione a Redis cloud
+r = redisfunc.cloudConnect()
 
 #FUNZIONE PER ACCEDERE, chiede nome, se esiste chiede psw, se corretta dà il bentornato.
 def ACCESSO(r, nome, password):
@@ -29,47 +24,11 @@ def ACCESSO(r, nome, password):
 
 # FUNZIONE PER REGISTRARSI, chiede nome utente, se non è gia presente chiede di inserire una psw
 # poi salva nome utente e psw e dà il benvenuto. infine chiede di aggiungere il primo contatto.
-
-
-def REGISTRAZIONE():
-
-    # chiede nome utente
-    nome_utente = input("Per cominciare inserisci il tuo nome utente: ")   
-    # se il nome utente non esiste
-    if not r.exists(nome_utente):
-        # chiede inserimento psw
-        pw = input("Inserisci una password di almeno 27 caratteri, di cui uno speciale, un numero trascendente, un ideogramma cinese, un disegnino che ti rappresenta")
-        # salva utente e psw
-        r.hset("Utenti",nome_utente, pw)
-        # Benvenuto
-        print(f"Benvenuto su AAAAAAAAAtsapp, {nome_utente}!\n")
-        # richiama funzione aggiungi contatto
-        print("Cerca subito un utente con cui chattare!")
-        AGGIUNTA_CONTATTO()
-        utente_on=nome_utente
-
-    # se il nome utente esiste già
-    else: 
-        print("esiste già un utente con questo nome!")
-
-def AGGIUNTA_CONTATTO():
-    global utente_on
-    # chiede nome del primo contatto
-    contatto = input("Chi vuoi aggiungere alla tua rubrica?")
-    # se il contatto esiste
-    p_c = r.hexists("Utenti",contatto)
-    if p_c:
-        # INSERIRE FUNZIONE CHE AGGIUNGE ALLA LISTA PERSONALE UTENTE
-        print(f"Contatto {contatto} aggiunto alla tua rubrica!")
-        r.sadd(f"Amici:{utente_on}",contatto)
-    
-    # se il contatto non esiste
-    else:
-        print("Non esiste alcun utente con questo nome!")
+utente_on = ""
 
 def SCEGLI_AZIONE():
-    SCELTA = input("1 - CERCA UTENTI\n2 - ")
-    return SCELTA
+    Scelta = input("0 - Esci\n1 - Cerca utenti\n2 - Aggiungi contatto")
+    return Scelta
 
 print("Benvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!")
 accesso = input("Scrivi ACCEDI se possiedi già un account, altrimenti REGISTRATI.")
