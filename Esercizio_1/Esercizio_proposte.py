@@ -60,8 +60,11 @@ if pw_utente:
             elif choose == "2":
                 nome_proposta = input("Che proposta vuoi votare?\nNome: ")
 
-                if r.get(f"Proposte:{nome_proposta}"):
-                    if not r.get(f"{nome_utente}:Voti:{nome_proposta}"):
+                if r.exists(f"Proposte:{nome_proposta}"):
+                    aggiunto = r.sadd(f'Proposte:Voti:{nome_proposta}', nome_utente)
+                    r.zincrby('Proposte', aggiunto, nome_proposta)
+                    
+                    if not r.exists(f"{nome_utente}:Voti:{nome_proposta}"):
                         r.incr(f"Voti:{nome_proposta}")
                         r.set(f"{nome_utente}:Voti:{nome_proposta}", 1)
                     else:
@@ -81,6 +84,8 @@ if pw_utente:
                 for proposta in proposte:
                     print(f"Nome:{proposta.split(':')[1]}")
                     print(f"Voti:{r.get('Voti:' + proposta.split(':')[1])}\n")
+                    print(f"Voti:{r.scard('Proposte:Voti:' + proposta.split(':')[1])}\n")
+                    
 
             elif choose == "5":
                 print('bye bye')

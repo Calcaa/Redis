@@ -11,30 +11,27 @@ except redis.ConnectionError:
     exit()
 
 #FUNZIONE PER ACCEDERE, chiede nome, se esiste chiede psw, se corretta dà il bentornato.
-def ACCESSO ():
-    global utente_on
+def ACCESSO(r, nome, password):
+        
     # richiesta nome utente
-    nome_utente = input("Inserisci il tuo nome utente: ")
-    pw_utente = r.hget("Utenti", nome_utente)
+    pw_utente = r.hget("Utenti", nome)
+    
     if pw_utente:
-        # richiesta psw
-        pw = input("Inserisci la password")
         # se psw inserita corrisponde ad esistente
-        if pw == pw_utente:
-            print(f"Bentornato {nome_utente}!")
-            utente_on=nome_utente
+        if password == pw_utente:
+            print(f"Bentornato {nome}!") 
         else:
             # se la psw inserita non corrisponde a quella esistente
             print("Password errata")
     else:
         print("Non esiste un utente con questo nome")
-    return nome_utente
+        REGISTRAZIONE(nome, password)
 
 # FUNZIONE PER REGISTRARSI, chiede nome utente, se non è gia presente chiede di inserire una psw
 # poi salva nome utente e psw e dà il benvenuto. infine chiede di aggiungere il primo contatto.
-utente_on = ""
-def REGISTRAZIONE ():
-    global utente_on
+
+
+def REGISTRAZIONE():
 
     # chiede nome utente
     nome_utente = input("Per cominciare inserisci il tuo nome utente: ")   
