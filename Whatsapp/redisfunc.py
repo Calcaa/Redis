@@ -13,23 +13,43 @@ def connessioneCloud() -> redis:
         print("Devi avviare Docker e runnare il container con Redis!")
         exit()
 
+#FUNZIONE PER ACCEDERE, chiede nome, se esiste chiede psw, se corretta dà il bentornato.
+def ACCESSO(r, nome, password):
+        
+    # richiesta nome utente
+    pw_utente = r.hget("Utenti", nome)
+    
+    if pw_utente:
+        
+        # se psw inserita corrisponde ad esistente
+        if password == pw_utente:
+            print(f"Bentornato {nome}!") 
+        else:
+            # se la psw inserita non corrisponde a quella esistente
+            print("Password errata")
+            
+    else:
+        print("Non esiste un utente con questo nome")
+        try:
+            scelta = input('Vuoi registrare questo nuovo utente? y/n\nScelta: ')
+            if scelta.lower() == 'y':
+                registrazione(r, nome, password)
+            else:
+                print('Il nuovo utente non verrà registrato')
+                
+        except ValueError:
+            print('err')
+            
+
 # FUNZIONE PER REGISTRARSI, chiede nome utente, se non è gia presente chiede di inserire una psw
 # poi salva nome utente e psw e dà il benvenuto. infine chiede di aggiungere il primo contatto.
 
 def registrazione (r : redis, nome_utente : str, pw : str) -> None:
-
-    # se il nome utente non esiste
-    if not r.exists(nome_utente):
-        
-        # salva utente e psw
+         # salva utente e psw
         r.hset("Utenti",nome_utente, pw)
 
         # Benvenuto
         print(f"Benvenuto su AAAAAAAAAtsapp, {nome_utente}!\n")
-
-    # se il nome utente esiste già
-    else: 
-        print("esiste già un utente con questo nome!")
 
 
 def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str):
