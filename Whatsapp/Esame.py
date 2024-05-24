@@ -11,23 +11,41 @@ accesso = input("Scrivi ACCEDI se possiedi già un account, altrimenti REGISTRAT
 # se scegli di accedere
 while True:
     if accesso == "ACCEDI":
-     redisfunc.ACCESSO()
+     nome = input('Inserisci il nome utente del tuo account: ')
+     password = input('Inserisci la password del tuo account: ')
+     redisfunc.ACCESSO(r, nome, password)
      break
  
-# se scegli di registrarti
-    elif accesso == "REGISTRATI":
-        redisfunc.registrazione()
-        break
 
 while True:
     choose = input(
                 f"\n\nCosa vuoi fare?\n"
-                f"1 - Aggiungi proposta\n"
-                f"2 - Vota Proposta\n"
-                f"3 - Visualizza proposte\n"
-                f"4 - Visualizza voti\n"
+                f"1 - Cerca utente\n"
+                f"2 - Aggiungi amico\n"
+                f"3 - Do Not Disturb\n"
+                f"4 - Apri chat\n"
                 f"5 - Esci\n\n"
                 f"Scelta: ")
+    
+    # 1 - scelta aggiunta proposta
+    if choose == "1":
+        cerca = input('Chi stai cercando')
+        result = r.hget('Utenti')
+
+            # 2 - scelta voto proposta
+    elif choose == "2":
+                pass
+
+            # 3 - scelta lettura proposte
+    elif choose == "3":
+                pass
+
+    elif choose == "4":
+                pass
+                    
+    elif choose == "5":
+                print('bye bye')
+                break
 
 
 
