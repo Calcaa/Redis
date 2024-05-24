@@ -1,6 +1,7 @@
 import redis
 from os import exit
 
+
 # Connessione a Redis
 def connessioneCloud() -> redis:
 
@@ -65,3 +66,13 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
     # se il contatto non esiste
     else:
         print("Non esiste alcun utente con questo nome!")
+
+def ApriChat(r : redis, nome_utente : str, destinatario : str):
+    listaNomi = [nome_utente, destinatario]
+    chiaveNomi = "".join(sorted(listaNomi))
+    if r.hget(chiaveNomi): 
+        #mettere la funzione asincrona per refreshare messaggi
+        pass
+    else: 
+        messaggio = input("messaggio: ")
+        r.hset(chiaveNomi + str())#da finire
