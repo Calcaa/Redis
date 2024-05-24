@@ -1,5 +1,5 @@
 import redis
-from os import exit
+from sys import exit
 
 # Connessione a Redis
 def connessioneCloud() -> redis:
