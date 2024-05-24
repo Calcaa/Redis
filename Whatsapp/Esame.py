@@ -1,14 +1,8 @@
 import redis
+import redisfunc
 from sys import exit
 
-# Connessione a Redis
-try:
-    r = redis.Redis(host="redis-11521.c135.eu-central-1-1.ec2.redns.redis-cloud.com", port=11521, password="sUaEw4HsesMiuONu3MURRZvuUDLqXeEi", db=0, decode_responses=True)
-    print(f"Stato db: {r.ping()}")
-    print("Connessione a redis in locale riuscita!")
-except redis.ConnectionError:
-    print("Devi avviare Docker e runnare il container con Redis!")
-    exit()
+r = redisfunc.cloudConnect()
 
 #FUNZIONE PER ACCEDERE, chiede nome, se esiste chiede psw, se corretta dà il bentornato.
 def ACCESSO ():
@@ -45,7 +39,7 @@ def REGISTRAZIONE ():
         # salva utente e psw
         r.hset("Utenti",nome_utente, pw)
         # Benvenuto
-        print(f"Benvenuto su AAAAAAAAAtsapp, {nome_utente}!\n")
+        print(f"Benvenuto su AAAAAAAAAtsapp, {nome_utente}!\n") 
         # richiama funzione aggiungi contatto
         print("Cerca subito un utente con cui chattare!")
         AGGIUNTA_CONTATTO()
