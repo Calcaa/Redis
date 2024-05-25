@@ -14,5 +14,8 @@ except redis.ConnectionError:
 pass_utente = input("Inserisci il tuo pass utente: ")'''
 #pw_utente = r.hset(f"Utenti", nome_utente, pass_utente)
 
-nome = 'calca'
-print(r.hget(f'Utenti', nome))
+'''nome = 'calca'
+print(r.hget(f'Utenti', nome))'''
+
+ina = r.hkeys('cal:*')
+print(r.hkeys('Utenti', ina ))
