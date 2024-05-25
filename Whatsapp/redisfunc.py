@@ -47,6 +47,7 @@ def ACCESSO(r, nome, password):
 def registrazione (r : redis, nome_utente : str, pw : str) -> None:
          # salva utente e psw
         r.hset("Utenti",nome_utente, pw)
+        r.sadd('Utenti:Nomi',nome_utente)
 
         # Benvenuto
         print(f"Benvenuto su AAAAAAAAAtsapp, {nome_utente}!\n")

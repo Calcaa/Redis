@@ -10,12 +10,12 @@ except redis.ConnectionError:
     print("Devi avviare Docker e runnare il container con Redis!")
     exit()
 
-'''nome_utente = input("Inserisci il tuo nome utente: ")
-pass_utente = input("Inserisci il tuo pass utente: ")'''
-#pw_utente = r.hset(f"Utenti", nome_utente, pass_utente)
 
-'''nome = 'calca'
-print(r.hget(f'Utenti', nome))'''
 
-ina = r.hkeys('cal:*')
-print(r.hkeys('Utenti', ina ))
+cerca = input('Chi stai cercando')
+result = r.hget('Utenti', cerca)
+print(result)
+if not result:
+    print('L\'utente non esiste')
+else:
+    print('trovato un utente')
