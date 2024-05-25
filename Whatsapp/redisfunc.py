@@ -1,5 +1,5 @@
 import redis
-from os import exit
+from sys import exit
 
 # Connessione a Redis
 def connessioneCloud() -> redis:
@@ -36,6 +36,7 @@ def ACCESSO(r, nome, password):
                 registrazione(r, nome, password)
             else:
                 print('Il nuovo utente non verrà registrato')
+                exit()
                 
         except ValueError:
             print('err')

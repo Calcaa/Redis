@@ -6,10 +6,11 @@ r = redisfunc.connessioneCloud()
 
 
 print("Benvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!")
-accesso = input("Scrivi ACCEDI se possiedi già un account, altrimenti REGISTRATI.")
 
 # se scegli di accedere
 while True:
+    accesso = input("Scrivi ACCEDI per entrare nel nostro sito.\n - ")
+    
     if accesso == "ACCEDI":
      nome_user = input('Inserisci il nome utente del tuo account: ')
      password = input('Inserisci la password del tuo account: ')
