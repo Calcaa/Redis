@@ -11,7 +11,7 @@ print("Benvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!")
 while True:
     accesso = input("Scrivi ACCEDI per entrare nel nostro sito.\n - ")
     
-    if accesso == "ACCEDI":
+    if accesso.upper() == "ACCEDI":
      nome_user = input('Inserisci il nome utente del tuo account: ')
      password = input('Inserisci la password del tuo account: ')
      redisfunc.ACCESSO(r, nome_user, password)
@@ -33,13 +33,8 @@ while True:
 #se no dice che non esiste
 
     if choose == "1":
-        cerca = input('Chi stai cercando? ')
-        result = r.sismember('Utenti:Nomi', cerca)
-        
-        if result:
-            print(f'Utente trovato: {cerca}')
-        else:
-            print('L\'utente non esiste')
+        if redisfunc.controllaContatto(r):
+             print("il contatto che hai cercato esiste")
         
         
     # 2 - scelta Aggiungi amico
@@ -53,6 +48,7 @@ while True:
         conferma = r.sismember(f'Contatti:{nome_user}', cerca)
         
         if result:
+            redisfunc.aggiungiContatto(r, nome_user, cerca)
             print('Utente aggiunto ai tuoi amici!\nCerca aggiunto fra i tuoi contatti.')
             r.sadd(f'Contatti:{nome_user}', cerca)
         
@@ -71,7 +67,7 @@ while True:
     #4 - scelta apri chat
 #penso un if che controlla l'esistenza, se non la trova crea la chat, all'interno della chat la funzione async? e la possibilità di scrivere messaggi 
     elif choose == "4":
-                pass
+        redisfunc.ApriChat(r, nome_user, "Calca") #da modificare
           
     #5 - esci, da implementare anche nel 4 (lascerei la chat aperta fino a che schiacciano 5)
     elif choose == "5":

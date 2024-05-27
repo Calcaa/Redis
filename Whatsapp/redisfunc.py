@@ -1,5 +1,6 @@
 import redis
 from sys import exit
+import time
 
 # Connessione a Redis
 def connessioneCloud() -> redis:
@@ -42,6 +43,13 @@ def ACCESSO(r, nome, password):
             print('err')
             
 
+def controllaContatto(r : redis, nome_contatto):
+    
+    if r.sismember('Utenti:Nomi', nome_contatto):
+        return True
+    return False
+
+
 # FUNZIONE PER REGISTRARSI, chiede nome utente, se non è gia presente chiede di inserire una psw
 # poi salva nome utente e psw e dà il benvenuto. infine chiede di aggiungere il primo contatto.
 
@@ -70,11 +78,17 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
 
 
 def ApriChat(r : redis, nome_utente : str, destinatario : str):
-    listaNomi = [nome_utente, destinatario]
-    chiaveNomi = "".join(sorted(listaNomi))
-    if r.hget(chiaveNomi): 
-        #mettere la funzione asincrona per refreshare messaggi
-        pass
-    else: 
-        messaggio = input("messaggio: ")
-        r.hset(chiaveNomi + str())#da finire 
+
+    if controllaContatto(r, destinatario):
+
+        listaNomi = [nome_utente, destinatario]
+        chiaveNomi = "".join(sorted(listaNomi))
+        if r.hexists(chiaveNomi, chiaveNomi + ":*"):
+            #mettere la funzione asincrona per refreshare messaggi
+            pass
+
+        messaggio = input("Messaggio: ")
+        r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
+        print(f"Messaggio inviato nella chat {chiaveNomi} con chiave {chiaveNomi}:{nome_utente}:{str(time.time())}")
+    else:
+        print("Il contatto non esiste")
