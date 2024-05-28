@@ -1,4 +1,3 @@
-import redis
 import redisfunc 
 
 # connessione a Redis cloud
@@ -33,13 +32,8 @@ while True:
 #se no dice che non esiste
 
     if choose == "1":
-        cerca = input('Chi stai cercando? ')
-        result = r.sismember('Utenti:Nomi', cerca)
-        
-        if result:
-            print(f'Utente trovato: {cerca}')
-        else:
-            print('L\'utente non esiste')
+        if redisfunc.controllaContatto(r):
+            print("Il contatto che stai cercando esiste")
         
         
     # 2 - scelta Aggiungi amico
@@ -48,12 +42,12 @@ while True:
 #stampare  che è gia presente, se no non esiste in generale
 
     elif choose == "2":
-        cerca = input('Scrivi l\'username di vuoi aggiungere fra i contatti: ')
+        cerca = input('Scrivi l\'username di chi vuoi aggiungere fra i contatti: ')
         result = r.hget('Utenti', cerca)
         conferma = r.sismember(f'Contatti:{nome_user}', cerca)
         
         if result:
-            print('Utente aggiunto ai tuoi amici!\nCerca aggiunto fra i tuoi contatti.')
+            redisfunc.aggiungiContatto(r, nome_user, cerca)
             r.sadd(f'Contatti:{nome_user}', cerca)
         
         elif conferma:
@@ -71,16 +65,9 @@ while True:
     #4 - scelta apri chat
 #penso un if che controlla l'esistenza, se non la trova crea la chat, all'interno della chat la funzione async? e la possibilità di scrivere messaggi 
     elif choose == "4":
-                pass
+        redisfunc.ApriChat(r, nome_user, "Calca")
           
     #5 - esci, da implementare anche nel 4 (lascerei la chat aperta fino a che schiacciano 5)
     elif choose == "5":
                 print('bye bye')
                 break
-
-
-
-
-
-    
-    

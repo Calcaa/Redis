@@ -1,5 +1,6 @@
 import redis
 from sys import exit
+import time
 
 # Connessione a Redis
 def connessioneCloud() -> redis:
@@ -40,7 +41,13 @@ def ACCESSO(r, nome, password):
                 
         except ValueError:
             print('err')
-            
+
+def controllaContatto(r : redis, nome_contatto):
+
+    if r.sismember('Utenti:Nomi', nome_contatto):
+        return True
+    return False
+
 
 # FUNZIONE PER REGISTRARSI, chiede nome utente, se non è gia presente chiede di inserire una psw
 # poi salva nome utente e psw e dà il benvenuto. infine chiede di aggiungere il primo contatto.
@@ -57,7 +64,7 @@ def registrazione (r : redis, nome_utente : str, pw : str) -> None:
 def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str):
 
     # se il contatto esiste
-    p_c = r.hexists("Utenti",contatto_da_aggiungere)
+    p_c = r.hexists("Utenti", contatto_da_aggiungere)
 
     if p_c:
         # INSERIRE FUNZIONE CHE AGGIUNGE ALLA LISTA PERSONALE UTENTE
@@ -70,11 +77,21 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
 
 
 def ApriChat(r : redis, nome_utente : str, destinatario : str):
-    listaNomi = [nome_utente, destinatario]
-    chiaveNomi = "".join(sorted(listaNomi))
-    if r.hget(chiaveNomi): 
-        #mettere la funzione asincrona per refreshare messaggi
-        pass
-    else: 
-        messaggio = input("messaggio: ")
-        r.hset(chiaveNomi + str())#da finire 
+
+    if controllaContatto(r, destinatario):
+            
+        if r.sismember(f"Amici:{nome_utente}", destinatario):
+            
+            listaNomi = [nome_utente, destinatario]
+            chiaveNomi = "".join(sorted(listaNomi))
+            if r.hexists(chiaveNomi, chiaveNomi + ":*"):
+                #mettere la funzione asincrona per refreshare messaggi
+                pass
+            
+            messaggio = input("Messaggio: ")
+            r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
+            print(f"Messaggio inviato nella chat {chiaveNomi} con chiave {chiaveNomi}:{nome_utente}:{str(time.time())}")
+        else:
+            print("Il contatto non e' tuo amico")
+    else:
+        print("Questa persona non esiste")
