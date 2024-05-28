@@ -89,6 +89,6 @@ def ApriChat(r : redis, nome_utente : str, destinatario : str):
 
         messaggio = input("Messaggio: ")
         r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
-        print(f"Messaggio inviato nella chat {chiaveNomi} con chiave {chiaveNomi}:{nome_utente}:{str(time.time())}")
+        #print(f"Messaggio inviato nella chat {chiaveNomi} con chiave {chiaveNomi}:{nome_utente}:{str(time.time())}")
     else:
         print("Il contatto non esiste")
