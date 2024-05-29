@@ -19,6 +19,12 @@ while True:
  
 
 while True:
+    if r.hget('DND', nome_user) == '0':
+        print('Do not disturb: OFF')
+    else:
+        print('Do not disturb: ON')
+        #da implementare il blocco messaggi
+
     choose = input(
                 f"\n\nCosa vuoi fare?\n"
                 f"1 - Cerca utente\n"
@@ -43,19 +49,18 @@ while True:
 #cercato esiste, se sì result lo aggiunge al set contatti:nome_utente, se conferma (elif) passa dovrebbe invece
 #stampare  che è gia presente, se no non esiste in generale
 
+
     elif choose == "2":
         cerca = input('Scrivi l\'username di chi vuoi aggiungere fra i contatti: ')
         result = r.hget('Utenti', cerca)
         conferma = r.sismember(f'Contatti:{nome_user}', cerca)
-        
+
         if result:
-            redisfunc.aggiungiContatto(r, nome_user, cerca)
-            print(f'Utente aggiunto ai tuoi amici!\n{cerca} aggiunto fra i tuoi contatti.')
-            r.sadd(f'Contatti:{nome_user}', cerca)
-        
-        elif conferma:
-            print('L\'utente è gia parte dei tuoi contatti!')
-        
+            if conferma:
+                print('L\'utente è già parte dei tuoi contatti!')
+            else:
+                redisfunc.aggiungiContatto(r, nome_user, cerca)
+                r.sadd(f'Contatti:{nome_user}', cerca)
         else:
             print('L\'utente non esiste!')
 
@@ -63,7 +68,7 @@ while True:
     # 3 - scelta Do Not Disturb
 #semplicemente una variabile in python, quando i = 1 non passano i messaggi (implementiamo un elif i = 1: pass tipo)
     elif choose == "3":
-                pass
+        redisfunc.DoNotDisturb(r, nome_user)
 
     #4 - scelta apri chat
 #penso un if che controlla l'esistenza, se non la trova crea la chat, all'interno della chat la funzione async? e la possibilità di scrivere messaggi 

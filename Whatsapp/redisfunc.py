@@ -55,6 +55,7 @@ def controllaContatto(r : redis, nome_contatto):
 def registrazione (r : redis, nome_utente : str, pw : str) -> None:
          # salva utente e psw
         r.hset("Utenti",nome_utente, pw)
+        r.hset('DND', nome_utente, 0) #crea un hash assieme al nome utente per il dnd
         r.sadd('Utenti:Nomi',nome_utente)
 
         # Benvenuto
@@ -95,3 +96,12 @@ def ApriChat(r : redis, nome_utente : str, destinatario : str):
             print("Il contatto non e' tuo amico")
     else:
         print("Questa persona non esiste")
+    
+def DoNotDisturb(r, nome_user):
+    
+    if r.hget('DND', nome_user) == '0':
+        r.hincrby('DND', nome_user, 1)
+        print('Do not disturb attivato')
+    else:
+        r.hincrby('DND', nome_user, -1)
+        print('Do not disturb disattivato')

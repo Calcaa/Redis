@@ -10,12 +10,10 @@ except redis.ConnectionError:
     print("Devi avviare Docker e runnare il container con Redis!")
     exit()
 
+nome_user = 'Calca2'
 
+a = r.hget('DND', nome_user)
+print(type(a))
 
-cerca = input('Chi stai cercando')
-result = r.hget('Utenti', cerca)
-print(result)
-if not result:
-    print('L\'utente non esiste')
-else:
-    print('trovato un utente')
+if r.hget('DND', nome_user) == '0':
+        print('Do not disturb: OFF')
