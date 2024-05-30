@@ -91,6 +91,7 @@ def ApriChat(r : redis, nome_utente : str, destinatario : str):
             
             messaggio = input("Messaggio: ")
             r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
+            r.sadd(f"Chat{nome_utente}",f"Chat-Con-{destinatario}")
             print(f"Messaggio inviato nella chat {chiaveNomi} con chiave {chiaveNomi}:{nome_utente}:{str(time.time())}")
         else:
             print("Il contatto non e' tuo amico")
@@ -116,3 +117,8 @@ def EliminaAmico (r,nome_utente):
         r.srem(f"Amici:{nome_utente}",amico)
     else:
         print(f"Non hai alcun amico con questo nome!")
+
+# Funzione mostra chat
+def MostraChat (r,nome_utente):
+    lista_chat = r.smembers(f"Chat{nome_utente}")
+    print(f"Ecco le tue chat:  {lista_chat}")

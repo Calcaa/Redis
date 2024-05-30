@@ -32,7 +32,8 @@ while True:
                 f"3 - Do Not Disturb\n"
                 f"4 - Apri chat\n"
                 f"5 - Esci\n"
-                f"6 - Elimina Amico\n\n"
+                f"6 - Elimina Amico\n"
+                f"7 - Mostra tutte le chat aperte\n\n"
                 f"Scelta: ")
     
     # 1 - scelta Cerca utente
@@ -87,6 +88,10 @@ while True:
     #6 - elimina amico
     elif choose == "6":
         redisfunc.EliminaAmico(r,nome_user)
+    
+    #7 - mostra tutte le mie chat
+    elif choose == "7":
+        redisfunc.MostraChat(r,nome_user)
         
 
 
