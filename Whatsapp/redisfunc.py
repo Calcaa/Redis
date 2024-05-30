@@ -105,3 +105,14 @@ def DoNotDisturb(r, nome_user):
     else:
         r.hincrby('DND', nome_user, -1)
         print('Do not disturb disattivato')
+
+# Funzione per eliminare amico, restituisce la lista amici e chiede chi vuoi eliminare.
+def EliminaAmico (r,nome_utente):
+    amici = r.smembers(f"Amici:{nome_utente}")
+    amico = input(f"Chi intendi eliminare?\n{amici}")
+    
+    if r.sismember(f"Amici:{nome_utente}",amico):
+        print(f"Amico {amico} rimosso!")
+        r.srem(f"Amici:{nome_utente}",amico)
+    else:
+        print(f"Non hai alcun amico con questo nome!")

@@ -31,7 +31,8 @@ while True:
                 f"2 - Aggiungi amico\n"
                 f"3 - Do Not Disturb\n"
                 f"4 - Apri chat\n"
-                f"5 - Esci\n\n"
+                f"5 - Esci\n"
+                f"6 - Elimina Amico\n\n"
                 f"Scelta: ")
     
     # 1 - scelta Cerca utente
@@ -82,6 +83,11 @@ while True:
     elif choose == "5":
                 print('bye bye')
                 break
+    
+    #6 - elimina amico
+    elif choose == "6":
+        redisfunc.EliminaAmico(r,nome_user)
+        
 
 
 #dobbiamo stampare le chat esistenti
