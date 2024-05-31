@@ -20,20 +20,21 @@ while True:
 
 while True:
     if r.hget('DND', nome_user) == '0':
-        print('Do not disturb: OFF')
+        print('\nDo not disturb: OFF')
     else:
-        print('Do not disturb: ON')
+        print('\nDo not disturb: ON')
         #da implementare il blocco messaggi
 
     choose = input(
                 f"\n\nCosa vuoi fare?\n"
                 f"1 - Cerca utente\n"
-                f"2 - Aggiungi amico\n"
-                f"3 - Do Not Disturb\n"
-                f"4 - Apri chat\n"
-                f"5 - Esci\n"
+                f"2 - Lista amici\n"
+                f"3 - Aggiungi amico\n"
+                f"4 - Do Not Disturb\n"
+                f"5 - Apri chat\n"
                 f"6 - Elimina Amico\n"
-                f"7 - Mostra tutte le chat aperte\n\n"
+                f"7 - Mostra tutte le chat aperte\n"
+                f"8 - Esci\n\n"
                 f"Scelta: ")
     
     # 1 - scelta Cerca utente
@@ -43,16 +44,17 @@ while True:
     if choose == "1":
         contatto = input('Chi vuoi cercare?\nScelta: ')
         if redisfunc.controllaContatto(r, contatto):
-             print("il contatto che hai cercato esiste")
-        
-        
-    # 2 - scelta Aggiungi amico
-#ho creato nella f(x) registrazione un secondo set per lo storing degli utenti, all'inizio cerco se l'utente
-#cercato esiste, se sì result lo aggiunge al set contatti:nome_utente, se conferma (elif) passa dovrebbe invece
-#stampare  che è gia presente, se no non esiste in generale
-
-
+             print("Il contatto che hai cercato esiste")
+        else:
+            print('Il contratto che hai cercato non esiste!')
+    
+    # 2 - stampa amici 
     elif choose == "2":
+        for amici in r.smembers(f'Contatti:{nome_user}'):
+            print(amici)
+        
+    # 3 - scelta Aggiungi amico
+    elif choose == "3":
         cerca = input('Scrivi l\'username di chi vuoi aggiungere fra i contatti: ')
         result = r.hget('Utenti', cerca)
         conferma = r.sismember(f'Contatti:{nome_user}', cerca)
@@ -67,23 +69,15 @@ while True:
             print('L\'utente non esiste!')
 
 
-    # 3 - scelta Do Not Disturb
-#semplicemente una variabile in python, quando i = 1 non passano i messaggi (implementiamo un elif i = 1: pass tipo)
-    elif choose == "3":
+    # 4 - scelta Do Not Disturb
+    elif choose == "4":
         redisfunc.DoNotDisturb(r, nome_user)
 
-    #4 - scelta apri chat
-#penso un if che controlla l'esistenza, se non la trova crea la chat, all'interno della chat la funzione async? e la possibilità di scrivere messaggi 
-    elif choose == "4":
+    #5 - scelta apri chat
+    elif choose == "5":
         #print('Chat esistenti:')
-        
         destinatario = input('a chi vuoi scrivere?\nScelta: ')
         redisfunc.ApriChat(r, nome_user, destinatario) #da modificare
-          
-    #5 - esci, da implementare anche nel 4 (lascerei la chat aperta fino a che schiacciano 5)
-    elif choose == "5":
-                print('bye bye')
-                break
     
     #6 - elimina amico
     elif choose == "6":
@@ -92,14 +86,11 @@ while True:
     #7 - mostra tutte le mie chat
     elif choose == "7":
         redisfunc.MostraChat(r,nome_user)
-        
-
-
-#dobbiamo stampare le chat esistenti
-#stampare la cronologia della chat
-#proviamo a vedere publish e spublish
-#5 per chiudere la chat  e riportarlo al menù principale
-
+    
+    #8 - esci, da implementare anche nel 5
+    elif choose == "8":
+                print('bye bye')
+                break
 
     
     
