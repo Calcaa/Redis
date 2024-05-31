@@ -77,7 +77,7 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
         print("Non esiste alcun utente con questo nome!")
 
 
-def ApriChat(r : redis, nome_utente : str, destinatario : str, effimera = False):
+def ApriChat(r : redis, nome_utente : str, destinatario : str, effimera : bool):
 
     def leggiChat(r : redis, chiaveNomi, nome_utente, destinatario):
         chat = r.hgetall(chiaveNomi)
@@ -100,10 +100,15 @@ def ApriChat(r : redis, nome_utente : str, destinatario : str, effimera = False)
                 
                 messaggio = input("\nMessaggio: ")
                 if messaggio != "":
-                    r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
+                    
                     if effimera == True:
+                        r.hset(f"Effimera:{chiaveNomi}", f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
+                        r.sadd(f"Chat{nome_utente}",f"Effimera: Chat-Con-{destinatario}")
                         print("Questa chat si autodistruggerà dopo un minuto dall'ultimo messaggio inviato! (l'FBI ha gia visto le tue dickpics)")
-                        r.expire(chiaveNomi,60)
+                        r.expire(f"Effimera:{chiaveNomi}",60)
+                    else:
+                        r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
+                        r.sadd(f"Chat{nome_utente}",f"Chat-Con-{destinatario}")
                 
                         
         else:

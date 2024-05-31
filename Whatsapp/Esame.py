@@ -80,10 +80,13 @@ while True:
         destinatario = input('a chi vuoi scrivere?\nScelta: ')
         
         try:
-            effimera = input("Desideri che la chat sia effimera? y/n")
-            if effimera.lower() == 'y':
-                effimera = True           
+            risposta = input("Desideri che la chat sia effimera? y/n")
+            if risposta.lower() == 'y':
+                effimera = True     
+            else:
+                effimera = False    
         except ValueError:
+            
             print('err')
         redisfunc.ApriChat(r, nome_user, destinatario, effimera)
         
