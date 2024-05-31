@@ -46,25 +46,25 @@ while True:
         if redisfunc.controllaContatto(r, contatto):
              print("Il contatto che hai cercato esiste")
         else:
-            print('Il contratto che hai cercato non esiste!')
+            print('Il contatto che hai cercato non esiste!')
     
     # 2 - stampa amici 
     elif choose == "2":
-        for amici in r.smembers(f'Contatti:{nome_user}'):
+        for amici in r.smembers(f'Amici:{nome_user}'):
             print(amici)
         
     # 3 - scelta Aggiungi amico
     elif choose == "3":
         cerca = input('Scrivi l\'username di chi vuoi aggiungere fra i contatti: ')
         result = r.hget('Utenti', cerca)
-        conferma = r.sismember(f'Contatti:{nome_user}', cerca)
+        conferma = r.sismember(f'Amici:{nome_user}', cerca)
 
         if result:
             if conferma:
                 print('L\'utente è già parte dei tuoi contatti!')
             else:
                 redisfunc.aggiungiContatto(r, nome_user, cerca)
-                r.sadd(f'Contatti:{nome_user}', cerca)
+                r.sadd(f'Amici:{nome_user}', cerca)
         else:
             print('L\'utente non esiste!')
 
