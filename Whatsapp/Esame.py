@@ -77,7 +77,14 @@ while True:
     elif choose == "5":
         #print('Chat esistenti:')
         destinatario = input('a chi vuoi scrivere?\nScelta: ')
-        redisfunc.ApriChat(r, nome_user, destinatario) #da modificare
+        
+        try:
+            effimera = input("Desideri che la chat sia effimera? y/n")
+            if effimera.lower() == 'y':
+                effimera = True           
+        except ValueError:
+            print('err')
+        redisfunc.ApriChat(r, nome_user, destinatario, effimera)
     
     #6 - elimina amico
     elif choose == "6":

@@ -77,7 +77,7 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
         print("Non esiste alcun utente con questo nome!")
 
 
-def ApriChat(r : redis, nome_utente : str, destinatario : str):
+def ApriChat(r : redis, nome_utente : str, destinatario : str, effimera = False):
 
     def leggiChat(r : redis, chiaveNomi, nome_utente, destinatario):
         chat = r.hgetall(chiaveNomi)
@@ -101,7 +101,11 @@ def ApriChat(r : redis, nome_utente : str, destinatario : str):
                 messaggio = input("\nMessaggio: ")
                 if messaggio != "":
                     r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
-
+                    if effimera == True:
+                        print("Questa chat si autodistruggerà dopo un minuto dall'ultimo messaggio inviato! (l'FBI ha gia visto le tue dickpics)")
+                        r.expire(chiaveNomi,60)
+                
+                        
         else:
             print("Il contatto non e' tuo amico")
     
@@ -132,3 +136,5 @@ def EliminaAmico (r,nome_utente):
 def MostraChat (r,nome_utente):
     lista_chat = r.smembers(f"Chat{nome_utente}")
     print(f"Ecco le tue chat:  {lista_chat}")
+
+
