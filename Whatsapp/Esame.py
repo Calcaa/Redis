@@ -73,7 +73,7 @@ while True:
     #4 - scelta apri chat
 #penso un if che controlla l'esistenza, se non la trova crea la chat, all'interno della chat la funzione async? e la possibilità di scrivere messaggi 
     elif choose == "4":
-        print('Chat esistenti:')
+        #print('Chat esistenti:')
         
         destinatario = input('a chi vuoi scrivere?\nScelta: ')
         redisfunc.ApriChat(r, nome_user, destinatario) #da modificare

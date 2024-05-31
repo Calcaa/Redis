@@ -79,21 +79,32 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
 
 def ApriChat(r : redis, nome_utente : str, destinatario : str):
 
+    def leggiChat(r : redis, chiaveNomi, nome_utente, destinatario):
+        chat = r.hgetall(chiaveNomi)
+
+        for key, message in sorted(chat.items(), key=lambda x: float(x[0].split(":")[2])):
+            print(f"{key.split(':')[1].replace(nome_utente, '>').replace(destinatario, '<')} {message}")
+
     if controllaContatto(r, destinatario):
             
         if r.sismember(f"Amici:{nome_utente}", destinatario):
+
+            if r.hget("DND", destinatario):
+                print("Errore: L'utente ha la modalita' non disturbare attiva")
             
-            listaNomi = [nome_utente, destinatario]
-            chiaveNomi = "".join(sorted(listaNomi))
-            if r.hexists(chiaveNomi, chiaveNomi + ":*"):
-                #mettere la funzione asincrona per refreshare messaggi
-                pass
-            
-            messaggio = input("Messaggio: ")
-            r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
-            print(f"Messaggio inviato nella chat {chiaveNomi} con chiave {chiaveNomi}:{nome_utente}:{str(time.time())}")
+            else:       
+                listaNomi = [nome_utente, destinatario]
+                chiaveNomi = "".join(sorted(listaNomi))
+                
+                leggiChat(r, chiaveNomi, nome_utente, destinatario)
+                
+                messaggio = input("\nMessaggio: ")
+                if messaggio != "":
+                    r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
+
         else:
             print("Il contatto non e' tuo amico")
+    
     else:
         print("Questa persona non esiste")
     
