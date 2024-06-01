@@ -89,7 +89,7 @@ def ApriChat(r : redis, nome_utente : str, destinatario : str, effimera : bool):
             
         if r.sismember(f"Amici:{nome_utente}", destinatario):
 
-            if r.hget("DND", destinatario):
+            if  r.hget("DND", destinatario) == '1':
                 print("Errore: L'utente ha la modalita' non disturbare attiva")
             
             else:       

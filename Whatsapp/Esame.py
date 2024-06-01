@@ -79,7 +79,7 @@ while True:
         destinatario = input('a chi vuoi scrivere?\nScelta: ')
         
         try:
-            risposta = input("Desideri che la chat sia effimera? y/n")
+            risposta = input("Desideri che la chat sia effimera? y/n\n")
             if risposta.lower() == 'y':
                 effimera = True     
             else:
