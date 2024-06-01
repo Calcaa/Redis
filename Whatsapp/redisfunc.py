@@ -103,7 +103,6 @@ def ApriChat(r : redis, nome_utente : str, destinatario : str, effimera : bool):
                     
                     if effimera == True:
                         r.hset(f"Effimera:{chiaveNomi}", f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
-                        r.sadd(f"Chat{nome_utente}",f"Effimera: Chat-Con-{destinatario}")
                         print("Questa chat si autodistruggerà dopo un minuto dall'ultimo messaggio inviato! (l'FBI ha gia visto le tue dickpics)")
                         r.expire(f"Effimera:{chiaveNomi}",60)
                     else:
