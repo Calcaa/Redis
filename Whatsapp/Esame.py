@@ -1,10 +1,8 @@
 import redis
 import redisfunc 
-import funzione_chat
 
 # connessione a Redis cloud
 r = redisfunc.connessioneCloud()
-
 
 print("\n\u001b[37mBenvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!\n")
 
@@ -90,7 +88,9 @@ while True:
         except ValueError:
             
             print('err')
-        redisfunc.ApriChat(r, nome_user, destinatario, effimera)
+        
+        # reverse True per visualizzare i mess dal più recente al meno recente, altrimenti False per visualizzazione al contrario
+        redisfunc.Chat(r, nome_user, destinatario, effimera, reverse = True)
     
     #6 - elimina amico
     elif choose == "6":
@@ -102,7 +102,7 @@ while True:
     
     #8 - esci, da implementare anche nel 5
     elif choose == "8":
-                print('\u001b[93mbye bye')
+                print('\u001b[93mbye bye\u001b[37m')
                 break
     
     
