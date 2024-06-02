@@ -92,33 +92,49 @@ def invia_messaggio(r, chiaveNomi, nome_utente, messaggio, effimera, destinatari
     r.publish(chiaveNomi, f"{nome_utente}:{messaggio}")
     ascolta_chat(r, chiaveNomi, nome_utente) #test
     
-    
+'''def ascolta_chat(r, chiaveNomi, nome_user):
+    pubsub = r.pubsub()
+    pubsub.subscribe(chiaveNomi)
+
+    for message in pubsub.listen():
+        if message['type'] == 'message':
+            
+            os.system('cls')
+            chat = r.hgetall(f'Chat:{chiaveNomi}')
+            for key, messaggio in sorted(chat.items()):
+                timestamp, user_msg = messaggio.split(' ', 1)
+                user, msg = user_msg.split(':', 1)
+                if user == nome_user:
+                    print(f"{timestamp} > {msg}")
+                else:
+                    print(f"{timestamp} < {msg}")  '''  
     
 def ascolta_chat(r, chiaveNomi, nome_user):
     pubsub = r.pubsub()
     pubsub.subscribe(chiaveNomi)
-    message = pubsub.get_message()
+    message = pubsub.listen()
     
     os.system('cls')
         
-    chat = r.hgetall(f'Chat:{chiaveNomi}')
+    '''chat = r.hgetall(f'Chat:{chiaveNomi}')
     for key, messaggio in chat.items():
             timestamp, user_msg = messaggio.split(' ', 1)
             user, msg = user_msg.split(':', 1)
             if user == nome_user:
                 print(f"{timestamp} > {msg}")
             else:
-                print(f"{timestamp} < {msg}")
-                
-    if message:
-        if message['type'] == 'message':
-            print(f'questo è il messaggio: {message}')
-            timestamp, user_msg = message['data'].split(' ', 1)
+                print(f"{timestamp} < {msg}")'''
+     
+    if not message is None:
+        chat = r.hgetall(f'Chat:{chiaveNomi}')
+        for key, messaggio in chat.items():
+            timestamp, user_msg = messaggio.split(' ', 1)
             user, msg = user_msg.split(':', 1)
             if user == nome_user:
                 print(f"{timestamp} > {msg}")
             else:
                 print(f"{timestamp} < {msg}")
+        
 
         
 
