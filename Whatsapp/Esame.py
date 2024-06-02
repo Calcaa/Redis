@@ -1,32 +1,34 @@
 import redis
 import redisfunc 
+import funzione_chat
 
 # connessione a Redis cloud
 r = redisfunc.connessioneCloud()
 
 
-print("Benvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!")
+print("\n\u001b[37mBenvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!\n")
 
 # se scegli di accedere
 while True:
-    accesso = input("Scrivi ACCEDI per entrare nel nostro sito.\n - ")
+    accesso = input("\u001b[37mScrivi \u001b[92mACCEDI \u001b[37mper entrare nel nostro sito.\n - ")
     
     if accesso.upper() == "ACCEDI":
-     nome_user = input('Inserisci il nome utente del tuo account: ')
-     password = input('Inserisci la password del tuo account: ')
-     redisfunc.ACCESSO(r, nome_user, password)
-     break
- 
+         
+        nome_user = input('Inserisci il \u001b[92mnome utente \u001b[37mdel tuo account: ')
+        password = input('Inserisci la \u001b[92mpassword \u001b[37mdel tuo account: ')
+        redisfunc.ACCESSO(r, nome_user, password)
+        # CORREGGERE QUESTA PARTE, SE SI SBAGLIA LA PSW NON SI DEVE AVERE ACCESSO
+        break
 
 while True:
     if r.hget('DND', nome_user) == '0':
-        print('\nDo not disturb: OFF')
+        print('\n\u001b[92mDo not disturb: OFF')
     else:
-        print('\nDo not disturb: ON')
+        print('\n\u001b[91mDo not disturb: ON')
         #da implementare il blocco messaggi
 
     choose = input(
-                f"\n\nCosa vuoi fare?\n"
+                f"\n\n\u001b[93mCosa vuoi fare?\u001b[37m\n\n"
                 f"1 - Cerca utente\n"
                 f"2 - Lista amici\n"
                 f"3 - Aggiungi amico\n"
@@ -50,23 +52,24 @@ while True:
     
     # 2 - stampa amici 
     elif choose == "2":
+        print("\n\u001b[93mI tuoi amici:\u001b[37m\n")
         for amici in r.smembers(f'Amici:{nome_user}'):
             print(amici)
         
     # 3 - scelta Aggiungi amico
     elif choose == "3":
-        cerca = input('Scrivi l\'username di chi vuoi aggiungere fra i contatti: ')
+        cerca = input('\nScrivi l\'username di chi vuoi \u001b[93maggiungere\u001b[37m ai tuoi contatti: ')
         result = r.hget('Utenti', cerca)
         conferma = r.sismember(f'Amici:{nome_user}', cerca)
 
         if result:
             if conferma:
-                print('L\'utente è già parte dei tuoi contatti!')
+                print('\n\u001b[91mL\'utente fa già parte dei tuoi contatti!\u001b[37m')
             else:
                 redisfunc.aggiungiContatto(r, nome_user, cerca)
                 r.sadd(f'Amici:{nome_user}', cerca)
         else:
-            print('L\'utente non esiste!')
+            print('\n\u001b[93mL\'utente non esiste!\u001b[37m')
 
 
     # 4 - scelta Do Not Disturb
@@ -76,10 +79,10 @@ while True:
     #5 - scelta apri chat
     elif choose == "5":
         #print('Chat esistenti:')
-        destinatario = input('a chi vuoi scrivere?\nScelta: ')
+        destinatario = input('\n\u001b[93ma chi vuoi scrivere?\n\u001b[37mScelta: ')
         
         try:
-            risposta = input("Desideri che la chat sia effimera? y/n\n")
+            risposta = input("Desideri aprire una chat \u001b[93meffimera\u001b[37m? y/n\n")
             if risposta.lower() == 'y':
                 effimera = True     
             else:
@@ -99,8 +102,10 @@ while True:
     
     #8 - esci, da implementare anche nel 5
     elif choose == "8":
-                print('bye bye')
+                print('\u001b[93mbye bye')
                 break
+    
+    
 
     
     

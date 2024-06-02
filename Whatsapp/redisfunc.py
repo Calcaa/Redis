@@ -1,6 +1,7 @@
 import redis
 from sys import exit
 import time
+import os
 
 # Connessione a Redis
 def connessioneCloud() -> redis:
@@ -8,10 +9,10 @@ def connessioneCloud() -> redis:
     try:
         r = redis.Redis(host="redis-11521.c135.eu-central-1-1.ec2.redns.redis-cloud.com", port=11521, password="sUaEw4HsesMiuONu3MURRZvuUDLqXeEi", db=0, decode_responses=True)
         print(f"Stato db: {r.ping()}")
-        print("Connessione a redis in locale riuscita!")
+        print("Connessione a redis riuscita!")
         return r
     except redis.ConnectionError:
-        print("Devi avviare Docker e runnare il container con Redis!")
+        print("Connessione a redis fallita!")
         exit()
 
 #FUNZIONE PER ACCEDERE, chiede nome, se esiste chiede psw, se corretta dà il bentornato.
@@ -24,7 +25,7 @@ def ACCESSO(r, nome, password):
         
         # se psw inserita corrisponde ad esistente
         if password == pw_utente:
-            print(f"Bentornato {nome}!") 
+            print(f"Bentornato \u001b[96m{nome}\u001b[37m!") 
         else:
             # se la psw inserita non corrisponde a quella esistente
             print("Password errata")
@@ -76,39 +77,61 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
     else:
         print("Non esiste alcun utente con questo nome!")
 
+# Funzione pulisci terminale
+def PulisciTerminale():
+    pulisci = "clear"
+    if os.name in ("nt", "dos"):
+        pulisci = "cls"
+    os.system(pulisci)
 
+# Funzione apri chat
 def ApriChat(r : redis, nome_utente : str, destinatario : str, effimera : bool):
-
+    
+    # Funzione che stampa i mess con > e <
     def leggiChat(r : redis, chiaveNomi, nome_utente, destinatario):
         chat = r.hgetall(chiaveNomi)
-
+        print(f"\u001b[96m>> Chat con {destinatario} <<\n\u001b[37m(scrivi \u001b[93msys exit\u001b[37m se intendi tornare al menù)\n")
+     
         for key, message in sorted(chat.items(), key=lambda x: float(x[0].split(":")[2])):
-            print(f"{key.split(':')[1].replace(nome_utente, '>').replace(destinatario, '<')} {message}")
+            print(f"\u001b[37m{key.split(':')[1].replace(nome_utente, '>').replace(destinatario, '<')} {message}")
 
+    # Funzione che controlla se esiste il contatto, se è in mod DND, se la chat è effimera e salva i messaggi.
     if controllaContatto(r, destinatario):
             
         if r.sismember(f"Amici:{nome_utente}", destinatario):
 
             if  r.hget("DND", destinatario) == '1':
-                print("Errore: L'utente ha la modalita' non disturbare attiva")
+                print("\u001b[91mErrore: L'utente ha la modalita' non disturbare attiva")
             
             else:       
                 listaNomi = [nome_utente, destinatario]
                 chiaveNomi = "".join(sorted(listaNomi))
                 
-                leggiChat(r, chiaveNomi, nome_utente, destinatario)
+                if effimera == False:
+                    leggiChat(r, chiaveNomi, nome_utente, destinatario)
+                else: 
+                    leggiChat(r,f"Effimera:{chiaveNomi}",nome_utente,destinatario)
                 
-                messaggio = input("\nMessaggio: ")
-                if messaggio != "":
+                while True:
+                    messaggio = input("\u001b[1mMessaggio: ")
                     
-                    if effimera == True:
-                        r.hset(f"Effimera:{chiaveNomi}", f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
-                        print("Questa chat si autodistruggerà dopo un minuto dall'ultimo messaggio inviato! (l'FBI ha gia visto le tue dickpics)")
-                        r.expire(f"Effimera:{chiaveNomi}",60)
-                    else:
-                        r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
-                        r.sadd(f"Chat{nome_utente}",f"Chat-Con-{destinatario}")
-                
+                    PulisciTerminale()
+                    
+                    if messaggio.lower() == "sys exit":
+                        break
+
+                    elif messaggio != "":
+                        
+                        if effimera == True:
+                            r.hset(f"Effimera:{chiaveNomi}", f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
+                            r.expire(f"Effimera:{chiaveNomi}",60)
+                            leggiChat(r,f"Effimera:{chiaveNomi}",nome_utente,destinatario)
+                        else:
+                            r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
+                            r.sadd(f"Chat{nome_utente}",f"Chat-Con-{destinatario}")
+                            leggiChat(r, chiaveNomi, nome_utente, destinatario)
+                        
+                    
                         
         else:
             print("Il contatto non e' tuo amico")
@@ -128,17 +151,26 @@ def DoNotDisturb(r, nome_user):
 # Funzione per eliminare amico, restituisce la lista amici e chiede chi vuoi eliminare.
 def EliminaAmico (r,nome_utente):
     amici = r.smembers(f"Amici:{nome_utente}")
-    amico = input(f"Chi intendi eliminare?\n{amici}")
+    print(f"\n\n\u001b[93mChi intendi eliminare?\n")
+    for amico in amici:
+        print(f"\u001b[37m{amico}")
+    amico = input("\nNome: ")
     
     if r.sismember(f"Amici:{nome_utente}",amico):
-        print(f"Amico {amico} rimosso!")
+        print(f"\u001b[93mAmico {amico} rimosso!\u001b[37m")
         r.srem(f"Amici:{nome_utente}",amico)
     else:
-        print(f"Non hai alcun amico con questo nome!")
+        print(f"\n\u001b[93mNon hai alcun amico con questo nome!\u001b[37m")
 
 # Funzione mostra chat
 def MostraChat (r,nome_utente):
     lista_chat = r.smembers(f"Chat{nome_utente}")
-    print(f"Ecco le tue chat:  {lista_chat}")
+    print(f"\n\u001b[93mEcco le tue chat:\u001b[37m \n")
+    for chat in lista_chat:
+        print(chat)
+
+
+
+
 
 
