@@ -15,6 +15,7 @@ while True:
     password = input('Inserisci la \u001b[92mpassword \u001b[37mdel tuo account: ')
     
     if redisfunc.ACCESSO(r, nome_user, password):
+        os.system('cls')
         break
 
 while True:

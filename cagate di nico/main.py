@@ -1,6 +1,7 @@
 import funzioni 
 import os
 import keyboard
+import threading
 
 # os.system('cls') per pulire alla fine
 # connessione a Redis cloud
@@ -90,7 +91,9 @@ while True:
         listaNomi = [nome_user, destinatario]
         chiaveNomi = "".join(sorted(listaNomi))
         
-        funzioni.ascolta_chat(r, chiaveNomi, nome_user) 
+        t = threading.Thread(target=funzioni.ascolta_chat, args=(r, chiaveNomi, nome_user))
+        t.start()
+        #funzioni.ascolta_chat(r, chiaveNomi, nome_user) 
         
         while True:
             messaggio = input("\nMessaggio: ")
