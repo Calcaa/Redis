@@ -1,6 +1,8 @@
 import redis
 import redisfunc 
+import os
 
+# os.system('cls') per pulire alla fine
 # connessione a Redis cloud
 r = redisfunc.connessioneCloud()
 
