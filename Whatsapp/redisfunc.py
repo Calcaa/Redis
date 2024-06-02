@@ -77,7 +77,7 @@ def registrazione (r : redis, nome_utente : str, pw : str) -> None:
         r.sadd('Utenti:Nomi',nome_utente)
 
         # Benvenuto
-        print(f"Benvenuto su AAAAAAAAAtsapp, {nome_utente}!\n")
+        print(f"Benvenuto su Faketsapp, {nome_utente}!\n")
 
 
 def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str):

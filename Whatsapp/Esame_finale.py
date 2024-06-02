@@ -1,6 +1,4 @@
-import redis
 import redisfunc
-import pandas as pd
 import os
 # terminale ####################################
 import pyfiglet as p
