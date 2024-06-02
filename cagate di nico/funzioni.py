@@ -1,7 +1,6 @@
 import redis
 from sys import exit
 from datetime import datetime
-import keyboard
 import os
 
 # Connessione a Redis
@@ -82,24 +81,38 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
 
 def invia_messaggio(r, chiaveNomi, nome_utente, messaggio, effimera, destinatario):
     ora = datetime.now()
-    oraStr = ora.strftime("[%d/%m/%Y - %H:%M:%S]")
+    oraStr = ora.strftime("[%d/%m/%Y-%H:%M:%S]")
     if effimera:
-        r.hset(f"Effimera:{chiaveNomi}", f"{chiaveNomi}:{nome_utente}:{ora}", messaggio)
-        r.expire(f"Effimera:{chiaveNomi}", 60)
+        r.hset(f"Chat:{chiaveNomi}", f"{chiaveNomi}:{nome_utente}:{ora}", f'{oraStr}\t {nome_utente}:{messaggio}')
+        r.expire(f"Chat:{chiaveNomi}", 60)
     else:
-        r.hset(f"Chat:{chiaveNomi}", f"{chiaveNomi}:{nome_utente}:{ora}", f'{oraStr}\t {messaggio}')
+        r.hset(f"Chat:{chiaveNomi}", f"{chiaveNomi}:{nome_utente}:{ora}", f'{oraStr}\t {nome_utente}:{messaggio}')
         r.sadd(f"Chat:{nome_utente}", f"Chat-Con-{destinatario}")
     
     r.publish(chiaveNomi, f"{nome_utente}:{messaggio}")
+    ascolta_chat(r, chiaveNomi, nome_utente) #test
+    
+    
     
 def ascolta_chat(r, chiaveNomi, nome_user):
     pubsub = r.pubsub()
     pubsub.subscribe(chiaveNomi)
+    message = pubsub.get_message()
     
-    print(f"Iscritto al canale {chiaveNomi}. In attesa di messaggi...")
-
-    for message in pubsub.listen():
+    os.system('cls')
+        
+    chat = r.hgetall(f'Chat:{chiaveNomi}')
+    for key, messaggio in chat.items():
+            timestamp, user_msg = messaggio.split(' ', 1)
+            user, msg = user_msg.split(':', 1)
+            if user == nome_user:
+                print(f"{timestamp} > {msg}")
+            else:
+                print(f"{timestamp} < {msg}")
+                
+    if message:
         if message['type'] == 'message':
+            print(f'questo è il messaggio: {message}')
             timestamp, user_msg = message['data'].split(' ', 1)
             user, msg = user_msg.split(':', 1)
             if user == nome_user:
@@ -107,49 +120,8 @@ def ascolta_chat(r, chiaveNomi, nome_user):
             else:
                 print(f"{timestamp} < {msg}")
 
+        
 
-    
-
-    
-def ApriChat(r : redis, nome_utente : str, destinatario : str, effimera : bool):
-
-    def leggiChat(r : redis, chiaveNomi, nome_utente, destinatario):
-        chat = r.hgetall(chiaveNomi)
-
-        for key, message in sorted(chat.items(), key=lambda x: float(x[0].split(":")[2])):
-            print(f"{key.split(':')[1].replace(nome_utente, '>').replace(destinatario, '<')} {message}")
-
-    if controllaContatto(r, destinatario):
-            
-        if r.sismember(f"Amici:{nome_utente}", destinatario):
-
-            if  r.hget("DND", destinatario) == '1':
-                print("Errore: L'utente ha la modalita' non disturbare attiva")
-            
-            else:       
-                listaNomi = [nome_utente, destinatario]
-                chiaveNomi = "".join(sorted(listaNomi))
-                
-                leggiChat(r, chiaveNomi, nome_utente, destinatario)
-                
-                messaggio = input("\nMessaggio: ")
-                if messaggio != "":
-                    
-                    if effimera == True:
-                        r.hset(f"Effimera:{chiaveNomi}", f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
-                        print("Questa chat si autodistruggerà dopo un minuto dall'ultimo messaggio inviato! (l'FBI ha gia visto le tue dickpics)")
-                        r.expire(f"Effimera:{chiaveNomi}",60)
-                    else:
-                        r.hset(chiaveNomi, f"{chiaveNomi}:{nome_utente}:{str(time.time())}", messaggio)
-                        r.sadd(f"Chat{nome_utente}",f"Chat-Con-{destinatario}")
-                
-                        
-        else:
-            print("Il contatto non e' tuo amico")
-    
-    else:
-        print("Questa persona non esiste")
-    
 def DoNotDisturb(r, nome_user):
     
     if r.hget('DND', nome_user) == '0':
@@ -174,6 +146,3 @@ def EliminaAmico (r,nome_utente):
 def MostraChat (r,nome_utente):
     lista_chat = r.smembers(f"Chat{nome_utente}")
     print(f"Ecco le tue chat:  {lista_chat}")
-
-
-

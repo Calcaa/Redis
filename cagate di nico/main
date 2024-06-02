@@ -1,10 +1,10 @@
-import redis
-import redisfunc 
+import funzioni 
 import os
+import keyboard
 
 # os.system('cls') per pulire alla fine
 # connessione a Redis cloud
-r = redisfunc.connessioneCloud()
+r = funzioni.connessioneCloud()
 
 
 print("Benvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!\n")
@@ -16,7 +16,7 @@ while True:
     if accesso.upper() == "ACCEDI":
      nome_user = input('Inserisci il nome utente del tuo account: ')
      password = input('Inserisci la password del tuo account: ')
-     redisfunc.ACCESSO(r, nome_user, password)
+     funzioni.ACCESSO(r, nome_user, password)
      os.system('cls')
      break
  
@@ -47,7 +47,7 @@ while True:
 
     if choose == "1":
         contatto = input('Chi vuoi cercare?\nScelta: ')
-        if redisfunc.controllaContatto(r, contatto):
+        if funzioni.controllaContatto(r, contatto):
              print("Il contatto che hai cercato esiste")
         else:
             print('Il contatto che hai cercato non esiste!')
@@ -67,7 +67,7 @@ while True:
             if conferma:
                 print('L\'utente è già parte dei tuoi contatti!')
             else:
-                redisfunc.aggiungiContatto(r, nome_user, cerca)
+                funzioni.aggiungiContatto(r, nome_user, cerca)
                 r.sadd(f'Amici:{nome_user}', cerca)
         else:
             print('L\'utente non esiste!')
@@ -75,31 +75,37 @@ while True:
 
     # 4 - scelta Do Not Disturb
     elif choose == "4":
-        redisfunc.DoNotDisturb(r, nome_user)
+        funzioni.DoNotDisturb(r, nome_user)
 
     #5 - scelta apri chat
     elif choose == "5":
         #print('Chat esistenti:')
-        destinatario = input('a chi vuoi scrivere?\nScelta: ')
-        
+        destinatario = input('A chi vuoi scrivere?\nScelta: ')
         try:
             risposta = input("Desideri che la chat sia effimera? y/n\n")
-            if risposta.lower() == 'y':
-                effimera = True     
-            else:
-                effimera = False    
+            effimera = risposta.lower() == 'y'
         except ValueError:
-            
             print('err')
-        redisfunc.ApriChat(r, nome_user, destinatario, effimera)
+
+        listaNomi = [nome_user, destinatario]
+        chiaveNomi = "".join(sorted(listaNomi))
+        
+        funzioni.ascolta_chat(r, chiaveNomi, nome_user) 
+        
+        while True:
+            messaggio = input("\nMessaggio: ")
+            if messaggio.lower() == 'esc':
+             break
+            funzioni.invia_messaggio(r, chiaveNomi, nome_user, messaggio, effimera, destinatario)  # Invio del messaggio
+
     
     #6 - elimina amico
     elif choose == "6":
-        redisfunc.EliminaAmico(r,nome_user)
+        funzioni.EliminaAmico(r,nome_user)
     
     #7 - mostra tutte le mie chat
     elif choose == "7":
-        redisfunc.MostraChat(r,nome_user)
+        funzioni.MostraChat(r,nome_user)
     
     #8 - esci, da implementare anche nel 5
     elif choose == "8":
