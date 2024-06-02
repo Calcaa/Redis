@@ -27,9 +27,11 @@ def ACCESSO(r, nome, password):
         # se psw inserita corrisponde ad esistente
         if password == pw_utente:
             print(f"Bentornato \u001b[96m{nome}\u001b[37m!") 
+            return True
         else:
             # se la psw inserita non corrisponde a quella esistente
             print("Password errata")
+            return False
             
     else:
         print("Non esiste un utente con questo nome")
@@ -71,8 +73,9 @@ def aggiungiContatto(r : redis, nome_utente : str, contatto_da_aggiungere : str)
 
     if p_c:
         # INSERIRE FUNZIONE CHE AGGIUNGE ALLA LISTA PERSONALE UTENTE
-        print(f"Contatto {contatto_da_aggiungere} aggiunto alla tua rubrica!")
         r.sadd(f"Amici:{nome_utente}",contatto_da_aggiungere)
+        print(f"Contatto {contatto_da_aggiungere} aggiunto alla tua rubrica!")
+        
     
     # se il contatto non esiste
     else:
@@ -146,7 +149,7 @@ def Chat(r : redis, nome_utente : str, destinatario : str, effimera : bool, reve
                             
                             # se la chat è effimera viene creato il sorted set per chat effimera in cui vengono salvati i mess
                             if effimera == True:
-                                r.zadd(f"Effimera:{chiaveNomi}", {f"{nome_utente}: {messaggio}           [{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}]":time.time()})
+                                r.zadd(f"Effimera:{chiaveNomi}", {f"{nome_utente}: {messaggio}\t\t\t\t[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]":time.time()})
                                 r.expire(f"Effimera:{chiaveNomi}",60)
 
                                 # vengono ristampati i messaggi
@@ -154,8 +157,8 @@ def Chat(r : redis, nome_utente : str, destinatario : str, effimera : bool, reve
                             
                             # se la chat non è effimera viene creato il sorted set per chat normale in cui vengono salvati i mess
                             else:
-                                r.zadd(chiaveNomi, {f"{nome_utente}: {messaggio}           [{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}]":time.time()})
-                                r.sadd(f"Chat{nome_utente}",f"Chat Con {destinatario}")
+                                r.zadd(chiaveNomi, {f"{nome_utente}: {messaggio}\t\t\t\t[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]":time.time()})
+                                r.sadd(f"Chat{nome_utente}",f"Chat con {destinatario}")
 
                                 # vengono ristampati i messaggi
                                 leggiChat(r, chiaveNomi, nome_utente, destinatario, reverse)
