@@ -1,14 +1,13 @@
 import redis
 import redisfunc
-
+import pandas as pd
+import os
 # terminale ####################################
 import pyfiglet as p
 from colorama import init, Fore, Back, Style 
 from termcolor import colored
 init(autoreset=True)
 #################################################
-
-
 
 # connessione a Redis cloud
 r = redisfunc.connessioneCloud()
@@ -24,6 +23,7 @@ while True:
     password = input("Inserisci la" + (Fore.RED + " password 🔒 ") + (Style.RESET_ALL + "del tuo account: "))
     
     if redisfunc.ACCESSO(r, nome_user, password):
+        os.system('cls')
         break
 
 while True:
@@ -48,21 +48,10 @@ while True:
                 f"Scelta: ")
     
     # 1 - scelta Cerca utente
-#ho creato un set con solo i nomi degli utenti, cerca l'input con ismember, se lo trova stampa l'username (quello cercato)
-#se no dice che non esiste
-
     if choose == "1":
         contatto = input("Chi vuoi cercare? 🔍 ")
-        
-        if redisfunc.controllaContatto(r, contatto):
-            choose = input("L'utente che hai cercato " + (Fore.GREEN + "esiste ") + (Style.RESET_ALL + "\n\nVuoi aggiungere questo utente ai tuoi contatti? ") + (Fore.GREEN + "y") + (Style.RESET_ALL + "/") + (Fore.RED + "n\nScelta: "))
+        redisfunc.ricercaContatto(r, contatto)
             
-            if choose.lower() == "y":
-                redisfunc.aggiungiContatto(r, nome_user, contatto)
-        
-        else:
-            print("L'utente che hai cercato " + (Fore.RED + "non esiste!"))
-    
     # 2 - stampa amici 
     elif choose == "2":
         print(Fore.YELLOW + "I tuoi amici: ")

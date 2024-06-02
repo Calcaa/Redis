@@ -3,6 +3,8 @@ from sys import exit
 import time
 import os
 from datetime import datetime
+import pandas as pd
+from colorama import init, Fore, Back, Style 
 
 # Connessione a Redis
 def connessioneCloud() -> redis:
@@ -51,6 +53,18 @@ def controllaContatto(r : redis, nome_contatto):
     if r.sismember('Utenti:Nomi', nome_contatto):
         return True
     return False
+
+def ricercaContatto(r, nome_contatto):
+    membri = r.smembers('Utenti:Nomi')
+    membri = list(membri)
+    df = pd.DataFrame(membri, columns=['Utenti'])
+    df = df[df['Utenti'].apply(lambda x: x.startswith(nome_contatto))]
+    for element in df['Utenti']:
+        print(element)
+    
+    if len(df) == 0:
+        print("Nessun utente corrispone a ciò che hai cercato " + (Fore.RED + "non esiste!"))
+
 
 
 # FUNZIONE PER REGISTRARSI, chiede nome utente, se non è gia presente chiede di inserire una psw
