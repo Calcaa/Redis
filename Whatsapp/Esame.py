@@ -1,39 +1,42 @@
 import redis
 import redisfunc 
+import os
 
+# os.system('cls') per pulire alla fine
 # connessione a Redis cloud
 r = redisfunc.connessioneCloud()
 
-
-print("Benvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!")
+print("\n\u001b[37mBenvenuto su AAAAAAAAAtsapp la nota app di SCONTRI!\n")
 
 # se scegli di accedere
 while True:
-    accesso = input("Scrivi ACCEDI per entrare nel nostro sito.\n - ")
+         
+    nome_user = input('Inserisci il \u001b[92mnome utente \u001b[37mdel tuo account: ')
+    password = input('Inserisci la \u001b[92mpassword \u001b[37mdel tuo account: ')
     
-    if accesso.upper() == "ACCEDI":
-     nome_user = input('Inserisci il nome utente del tuo account: ')
-     password = input('Inserisci la password del tuo account: ')
-     redisfunc.ACCESSO(r, nome_user, password)
-     break
- 
+    if redisfunc.ACCESSO(r, nome_user, password):
+        os.system('cls')
+        break
 
 while True:
+    
     if r.hget('DND', nome_user) == '0':
-        print('Do not disturb: OFF')
+        print('\n\u001b[92mDo not disturb: OFF')
+    
     else:
-        print('Do not disturb: ON')
+        print('\n\u001b[91mDo not disturb: ON')
         #da implementare il blocco messaggi
 
     choose = input(
-                f"\n\nCosa vuoi fare?\n"
+                f"\n\n\u001b[93mCosa vuoi fare?\u001b[37m\n\n"
                 f"1 - Cerca utente\n"
-                f"2 - Aggiungi amico\n"
-                f"3 - Do Not Disturb\n"
-                f"4 - Apri chat\n"
-                f"5 - Esci\n"
+                f"2 - Lista amici\n"
+                f"3 - Aggiungi amico\n"
+                f"4 - Do Not Disturb\n"
+                f"5 - Apri chat\n"
                 f"6 - Elimina Amico\n"
-                f"7 - Mostra tutte le chat aperte\n\n"
+                f"7 - Mostra tutte le chat aperte\n"
+                f"8 - Esci\n\n"
                 f"Scelta: ")
     
     # 1 - scelta Cerca utente
@@ -41,57 +44,67 @@ while True:
 #se no dice che non esiste
 
     if choose == "1":
-        contatto = input('Chi vuoi cercare?\nScelta: ')
+        contatto = input("Chi vuoi cercare?\nScelta: ")
+        
         if redisfunc.controllaContatto(r, contatto):
-             print("il contatto che hai cercato esiste")
+            choose = input("L'utente che hai cercato esiste\n\nVuoi aggiungere questo utente ai tuoi contatti? y/n\nScelta: ")
+            
+            if choose.lower() == "y":
+                redisfunc.aggiungiContatto(r, nome_user, contatto)
         
-        
-    # 2 - scelta Aggiungi amico
-#ho creato nella f(x) registrazione un secondo set per lo storing degli utenti, all'inizio cerco se l'utente
-#cercato esiste, se sì result lo aggiunge al set contatti:nome_utente, se conferma (elif) passa dovrebbe invece
-#stampare  che è gia presente, se no non esiste in generale
-
-
+        else:
+            print("L'utente che hai cercato non esiste!")
+    
+    # 2 - stampa amici 
     elif choose == "2":
-        cerca = input('Scrivi l\'username di chi vuoi aggiungere fra i contatti: ')
+        print("\n\u001b[93mI tuoi amici:\u001b[37m\n")
+        
+        for amici in r.smembers(f'Amici:{nome_user}'):
+            print(amici)
+        
+    # 3 - scelta Aggiungi amico
+    elif choose == "3":
+        cerca = input("\nScrivi l\'username di chi vuoi \u001b[93maggiungere\u001b[37m ai tuoi contatti: ")
         result = r.hget('Utenti', cerca)
-        conferma = r.sismember(f'Contatti:{nome_user}', cerca)
+        conferma = r.sismember(f'Amici:{nome_user}', cerca)
 
         if result:
+            
             if conferma:
-                print('L\'utente è già parte dei tuoi contatti!')
+                print('\n\u001b[91mL\'utente fa già parte dei tuoi contatti!\u001b[37m')
+            
             else:
                 redisfunc.aggiungiContatto(r, nome_user, cerca)
-                r.sadd(f'Contatti:{nome_user}', cerca)
+                r.sadd(f"Amici:{nome_user}", cerca)
+        
         else:
-            print('L\'utente non esiste!')
+            print("\n\u001b[93mL\'utente non esiste!\u001b[37m")
 
 
-    # 3 - scelta Do Not Disturb
-#semplicemente una variabile in python, quando i = 1 non passano i messaggi (implementiamo un elif i = 1: pass tipo)
-    elif choose == "3":
+    # 4 - scelta Do Not Disturb
+    elif choose == "4":
         redisfunc.DoNotDisturb(r, nome_user)
 
-    #4 - scelta apri chat
-#penso un if che controlla l'esistenza, se non la trova crea la chat, all'interno della chat la funzione async? e la possibilità di scrivere messaggi 
-    elif choose == "4":
+    #5 - scelta apri chat
+    elif choose == "5":
         #print('Chat esistenti:')
-        
-        destinatario = input('a chi vuoi scrivere?\nScelta: ')
+        destinatario = input('\n\u001b[93ma chi vuoi scrivere?\n\u001b[37mScelta: ')
         
         try:
-            effimera = input("Desideri che la chat sia effimera? y/n")
-            if effimera.lower() == 'y':
-                effimera = True           
-        except ValueError:
-            print('err')
-        redisfunc.ApriChat(r, nome_user, destinatario, effimera)
+            risposta = input("Desideri aprire una chat \u001b[93meffimera\u001b[37m? y/n\n")
+            
+            if risposta.lower() == "y":
+                effimera = True     
+            
+            else:
+                effimera = False    
         
-          
-    #5 - esci, da implementare anche nel 4 (lascerei la chat aperta fino a che schiacciano 5)
-    elif choose == "5":
-                print('bye bye')
-                break
+        except ValueError:
+            
+            print("err")
+        
+        # reverse True per visualizzare i mess dal più recente al meno recente, altrimenti False per visualizzazione al contrario
+        redisfunc.Chat(r, nome_user, destinatario, effimera, reverse = True)
     
     #6 - elimina amico
     elif choose == "6":
@@ -100,14 +113,8 @@ while True:
     #7 - mostra tutte le mie chat
     elif choose == "7":
         redisfunc.MostraChat(r,nome_user)
-        
-
-
-#dobbiamo stampare le chat esistenti
-#stampare la cronologia della chat
-#proviamo a vedere publish e spublish
-#5 per chiudere la chat  e riportarlo al menù principale
-
-
     
-    
+    #8 - esci, da implementare anche nel 5
+    elif choose == "8":
+        print("\u001b[93mbye bye\u001b[37m")
+        break
